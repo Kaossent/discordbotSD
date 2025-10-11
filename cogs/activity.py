@@ -294,6 +294,7 @@ class ActivityCog(commands.Cog):
         await inter.edit_original_message(embed=embed)
 
 
+
 def setup(bot):
     bot.add_cog(ActivityCog(bot))
     print("ActivityCog is ready")

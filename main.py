@@ -19,7 +19,14 @@ collusers = cluster.server.users
 collservers = cluster.server.servers
 collpromos = cluster.server.promos
 collreports = cluster.server.reports
+collgiveways = cluster.server.giveways
 
+ROLE_CATEGORIES = {
+    "admin": [518505773022838797, 580790278697254913],  # ID ролей администраторов: admin, chief
+    "moder": [518505773022838797, 580790278697254913, 702593498901381184],  # ID ролей модераторов: admin, chief, moder
+    "staff": [518505773022838797, 580790278697254913, 702593498901381184, 1229337640839413813],  # ID ролей стаффа: admin, chief, moder, dev
+    "premium": [518505773022838797, 580790278697254913, 702593498901381184, 1229337640839413813, 757930494301044737, 1044314368717897868, 1303396950481174611],  # ID премиум-ролей: admin, chief, moder, dev booster, diamond, gold
+}
 
 rules = {
     "1.1": "1.1> Обман/попытка обмана Администрации сервера, грубое оспаривание действий Администрации сервера",
@@ -36,20 +43,6 @@ rules = {
     "3.1": "3.1> Крики, шумы, помехи, транслирование музыки не через бота, неадекватное поведение, использование программ для изменения голоса",
     "3.2": "3.2> Многочисленные перемещения по голосовым каналам, быстрое включение/выключение демонстрации экрана",
     "3.3": "3.3> AFK-фарм Румбиков ◊"
-}
-
-
-ROLE_CATEGORIES = {
-    "admin": [518505773022838797],
-    "chief": [580790278697254913],
-    "moder": [702593498901381184],
-    "dev": [1229337640839413813],
-    "booster": [757930494301044737],
-    "diamond": [1044314368717897868],
-    "gold": [1303396950481174611],
-    "modstaff": [518505773022838797, 580790278697254913, 702593498901381184],
-    "staff": [518505773022838797, 580790278697254913, 702593498901381184, 1229337640839413813],  # ID ролей стаффа: admin, chief, moder, dev
-    "premium": [757930494301044737, 1044314368717897868, 1303396950481174611],  # ID премиум-ролей: booster, diamond, gold
 }
 
 class RoleCheckFailure(commands.CheckFailure):
@@ -73,8 +66,6 @@ def check_roles(*categories):
         role_list = ", ".join(missing_roles_mentions)
 
         raise RoleCheckFailure(f"У вас нет прав для использования этой команды. Необходимо иметь одну из этих ролей:\n {role_list}.")
-        print(f"[ERR] Пользователь {interaction.author} не имеет нужных ролей. Требуются: {role_list}")
-
     return commands.check(predicate)
 
 
@@ -227,6 +218,8 @@ async def on_ready():
                 "ban_reason": None,
                 "number_of_roles": 0,
                 "role_ids": [],
+                "level": 0,
+                "experience": 0
             }
             server_values = {
                 "_id": guild.id,
@@ -321,6 +314,8 @@ async def on_member_join(member):
         "ban_reason": None,
         "number_of_roles": 0,
         "role_ids": [],
+        "level": 0,
+        "experience": 0
     }
 
     if collusers.count_documents({"id": member.id, "guild_id": member.guild.id}) == 0:

@@ -84,7 +84,7 @@ class EconomyCog(commands.Cog):
         self.excluded_channels = {1070322967634006057, 532628352927006737, 944562833901899827, 1270673733178101801}
         self.excluded_roles = {
             518505773022838797,  # Администратор
-            580790278697254913,  # Гл. Модератор
+            580790278697254913,  # Ст. Модератор
             702593498901381184,  # Модератор
             1044314368717897868,  # Diamond
             757930494301044737,  # Server Booster
@@ -105,6 +105,21 @@ class EconomyCog(commands.Cog):
                     disnake.ui.Button(label="🚀 Активировать на 3 дня", style=disnake.ButtonStyle.primary, custom_id='3_days'),
                     disnake.ui.Button(label="🚀 Активировать на 7 дней", style=disnake.ButtonStyle.success, custom_id='7_days')
                 ]
+        self.role_award = {
+            5: 519925709603471381,
+            10: 519925711113289748,
+            15: 521760576423329794,
+            20: 519925714309349377,
+            25: 519925715458719799,
+            30: 519925716331134976,
+            35: 862727316479148065,
+            40: 896481674114785300,
+            45: 896481824199573574,
+            50: 896481809972461690,
+            55: 896482036079005737,
+            60: 896482158636585040,
+            65: 519925718767894531
+        }
 
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
@@ -929,14 +944,39 @@ class EconomyCog(commands.Cog):
         await inter.edit_original_response(embed=embed, view=view)
 
 
+    async def on_update_experience(self, id, guild_id, level, before, after):
+        first_level = 100
+        experience_to_level = first_level + (100 * level)
+        experience = collusers.find_one({"id": id, "guild_id": guild_id})["experience"]
+        print(level)
+        if experience > experience_to_level:
+            unnecessary_experience = experience - experience_to_level
+            level += 1
+            collusers.update_one({'id': id, 'guild_id': guild_id}, {"$inc": {"level": 1}})
+            collusers.update_one({'id': id, 'guild_id': guild_id}, {"$set": {"experience": unnecessary_experience}})
+            collusers.update_one({'id': id, 'guild_id': guild_id}, {"$inc": {"balance": 50 * level}})
+            try:
+                if self.role_award[level]:
+                    guild_id = self.bot.get_guild(guild_id)
+                    role = guild_id.get_role(self.role_award[level])
+                    member = guild_id.get_member(id)
+                    await member.add_roles(role)
+                    await member.remove_roles(guild_id.get_role(self.role_award[level - 5]))
+            except:
+                print('Role not found')
+            print(
+                f'Updated experience and level, {unnecessary_experience}, {level}, balance incremented on {50 * level}')
+        else:
+            print('<')
+
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         global time_in_voice, multiplier
-
+        print('Onvoice')
 
         if member.bot:
             return
-
+        experience_minute = 0.5
         channel = member.guild.get_channel(944562833901899827)
         afk_channel_id = 516299058348818433
         now = int(datetime.now().timestamp())
@@ -984,11 +1024,16 @@ class EconomyCog(commands.Cog):
                 if before.channel.id != afk_channel_id:
                     minutes = round(total_time[member.id] / 60, 2)
                     rumbiks = round(duration / 60 * 0.1, 2)
+                    experience = int(round(duration / 60 * experience_minute,0))
 
                     multiplier = collservers.find_one({'_id': member.guild.id})['multiplier']
                     if rumbiks > 0.01:
-                        collusers.find_one_and_update({'id': member.id}, {'$inc': {'balance': rumbiks * multiplier}})
+                        collusers.find_one_and_update({'id': member.id, 'guild_id': member.guild.id}, {'$inc': {'balance': rumbiks * multiplier}})
                         collservers.update_one({"_id": member.guild.id}, {"$inc": {"voice_rumbiks": rumbiks * multiplier, "total_rumbicks": rumbiks * multiplier}}, upsert=True)
+                    if experience >= 1:
+                        level = collusers.find_one({'id': member.id, 'guild_id': member.guild.id})['level']
+                        collusers.update_one({'id': member.id, 'guild_id': member.guild.id}, {"$inc": {'experience': experience * multiplier}})
+                        await self.on_update_experience(member.id, member.guild.id, level, 0, 0)
 
                     if multiplier > 1:
                         rumbikswithboost = rumbiks * multiplier
@@ -1015,6 +1060,7 @@ class EconomyCog(commands.Cog):
                             f'Время (без учёта мута): `{formatted_duration}`\n'
                             f'Время (всего): `{formatted_total_time}`\n'
                             f'{f"**Выдано с учетом бустера:** `{rumbikswithboost}`{emoji}" if multiplier > 1 else f"**Выдано:** `{rumbiks}`{emoji}"}\n'
+                            f'Опыта с учетом бустера: **{experience}**\n'
                             f'Общее время в войсе: `{formatted_time_in_voice}`'
                         )
                     )
@@ -1123,9 +1169,8 @@ class EconomyCog(commands.Cog):
 
         async def send_message_on_booster_end(booster_type, multiplier):
             channel = self.bot.get_channel(489867322039992323)
-            server_id = 489867322039992320
             guild = self.bot.get_guild(server_id)  # Получаем объект сервера
-            icon_url = guild.icon.url if guild.icon else None
+            icon_url = guild.icon.url if guild.icon else None  # Получаем URL иконки, если она установлена
 
             embed = disnake.Embed(
                 title=f"{booster_type} бустер закончился.",

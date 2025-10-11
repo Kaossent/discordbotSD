@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточка участника</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Градиентные текстовые эффекты */
+        .gradient-text {
+            background: linear-gradient(to right, #22d3ee, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Градиентная рамка */
+        .gradient-border {
+            background: linear-gradient(135deg, #3022ee, #3b82f6, #a855f7);
+        }
+        
+        /* Градиентный фон карточки */
+        .gradient-bg {
+            background: linear-gradient(135deg, #111827, #1e293b);
+        }
+        
+        /* Градиентный бейдж */
+        .gradient-badge {
+            background: linear-gradient(to right, #06b6d4, #8b5cf6);
+        }
+
+        /* Прогресс бар */
+        .progress-bar {
+            background: linear-gradient(to right, #06b6d4, #8b5cf6);
+        }
+        
+        /* Стили для аватара */
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #111827;
+        }
+        
+        .avatar-fallback {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a7f3d0, #ddd6fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #374151;
+            border: 2px solid #111827;
+        }
+        
+        /* Критически важные стили для html2image */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            width: 324px; /* точная ширина карточки */
+            height: 380px; /* точная высота карточки */
+            overflow: hidden;
+        }
+        
+        html {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        
+        /* Основной контейнер */
+        .card-container {
+            width: 324px;
+            height: 380px;
+            display: block;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+        }
+        
+        /* Убедимся, что все элементы видны */
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Контейнер карточки для html2image -->
+    <div class="card-container">
+        <!-- Карточка участника -->
+        <div class="w-80 overflow-hidden gradient-bg rounded-lg relative" style="padding: 2px;">
+            <!-- Градиентная рамка -->
+            <div class="gradient-border rounded-lg p-0.5">
+                <div class="gradient-bg rounded-lg h-full w-full">
+                    
+                    <!-- Содержимое карточки -->
+                    <div class="relative p-6 flex flex-col items-center space-y-4">
+                        
+                        <!-- Аватар с градиентной рамкой -->
+                        <div class="relative">
+                            <div class="gradient-border rounded-full p-0.5">
+                                <div class="bg-gray-900 rounded-full h-full w-full p-0.5">
+                                    <!-- Замените URL ниже на свою картинку -->
+                                    <img src="{{ avatar_url }}" 
+                                         alt="Аватар пользователя" 
+                                         class="avatar"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="avatar-fallback" style="display: none;">
+                                        {{ avatar_fallback }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <span class="text-white border-0 px-3 py-1 rounded-md text-sm font-medium", style="background: {{ role_color }};">
+                                {{ role }}
+                            </span>
+                        </div>
+                        
+                        <!-- Никнейм -->
+                        <div class="text-center">
+                            <h3 class="text-lg font-medium" style="color: {{ role_color }}">
+                                {{ username }}
+                            </h3>
+                        </div>
+
+                        <!-- Уровень -->
+                        <div class="flex items-center space-x-2">
+                            <span class="gradient-badge text-white border-0 px-3 py-1 rounded-md text-sm font-medium">
+                                Уровень {{ level }}
+                            </span>
+                        </div>
+
+                        <!-- Прогресс опыта -->
+                        <div class="w-full space-y-2">
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <span>Опыт</span>
+                                <span>{{ current_xp }}/{{ max_xp }} ({{ percentage }}%)</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                                <div class="progress-bar h-full rounded-full" style="width: {{ progress_percentage }}%"></div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-gray-400">Рейтинг: <span class="font-medium gradient-text"">#{{ rank }}</span></div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
