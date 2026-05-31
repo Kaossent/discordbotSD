@@ -20,5 +20,5 @@ async def generate_response(prompt, instructions, error):
 
         return response.choices[0].message.content
     except Exception as e:
-        print(f"Не смог сгенерировать запрос.")
+        print(f"Не смог сгенерировать запрос,.")
         return error
