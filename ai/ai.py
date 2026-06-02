@@ -3,7 +3,7 @@ from os import getenv
 from dotenv import load_dotenv
 from sys import exit
 
-client = AsyncGroq(api_key="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")
+client = AsyncGroq(api_key="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")
 model = "llama3-70b-8192"
 
 
@@ -20,5 +20,5 @@ async def generate_response(prompt, instructions, error):
 
         return response.choices[0].message.content
     except Exception as e:
-        print(f"Не смог сгенерировать запрос,.")
+        print(f"Не смог сгенерировать запрос.")
         return error
