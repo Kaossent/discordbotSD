@@ -1,37 +1,102 @@
-# Shadow Dragons multi-functional Bot
+# discordbotSD
+
+Discord-бот для сервера на базе [disnake](https://github.com/DisnakeDevs/disnake) с MongoDB, GPT-интеграцией, системой рангов, экономикой и модерацией.
+
+## Стек
+
+- Python 3.11
+- disnake 2.10.1
+- MongoDB (pymongo)
+- g4f (GPT)
+- Pillow + html2image (генерация изображений)
+- Docker
 
 ---
 
-![discordbotSD](./SDmfB.png)
+## Быстрый старт
+
+### 1. Клонировать репозиторий
+
+```bash
+git clone https://github.com/Kaossent/discordbotSD.git
+cd discordbotSD
+```
+
+### 2. Настроить переменные окружения
+
+```bash
+cp .env.example .env
+```
+
+Заполнить `.env`:
+
+```
+TOKEN=твой_discord_bot_token
+MONGODB=mongodb+srv://user:pass@cluster.mongodb.net/dbname
+```
+
+### 3a. Запуск через Docker (рекомендуется для production)
+
+```bash
+docker compose up -d --build
+```
+
+Логи:
+```bash
+docker compose logs -f
+```
+
+Остановка:
+```bash
+docker compose down
+```
+
+### 3b. Запуск без Docker
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
 
 ---
-All commands
-- [/balance - Show user balance](./img/balance.png)
-- [/top - Show top user for type in `TopEnum` class](./img/top.png)
-- [/pay - Pay rumbiks](./img/pay.png)
-- [/rps - Rock-Paper-Scissors](./img/rps.png)
-- [/warn](./img/warn.png)
-- [/warns - Show your or member warns](./img/warns.png)
-- [/user-info - Show your info or member info](./img/userinfo.png)
-    - [Logs warn/mute/ban system](./img/warnss.png)
-    - [Logs warn/mute/ban system](./img/voice.png)
----
-# Installation
 
-1. clone the repository:
+## Структура проекта
 
-    `git clone https://github.com/ida64pro/discordbotSD.git`
-
-    `cd discordbotSD`
-
-2. install the dependencies: `pip install`
-
-3. Create DataBase mongodb 
-
-4. Connect for bot
-
-5. Insert your bot token from discord developer
-
-6. run the bot: `python main.py`
+```
+discordbotSD/
+├── main.py              # Точка входа, события бота
+├── requirements.txt     # Зависимости
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example         # Шаблон переменных окружения
+├── cogs/                # Команды и события (20 когов)
+│   ├── rank.py
+│   ├── economy.py
+│   ├── banner.py
+│   ├── GPT.py
+│   └── ...
+├── ai/                  # GPT-логика
+│   ├── gpt_core.py
+│   └── ...
+├── img/                 # Изображения
+├── static/              # Статика для html2image
+└── resource/            # Ресурсы
+```
 
 ---
+
+## Переменные окружения
+
+| Переменная | Описание |
+|---|---|
+| `TOKEN` | Discord Bot Token ([получить](https://discord.com/developers/applications)) |
+| `MONGODB` | MongoDB connection string |
+
+---
+
+## Требования к боту (Discord)
+
+- Intents: все включены (Privileged: Members + Message Content)
+- Permissions: Administrator (или точечно по нужным когам)
