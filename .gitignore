@@ -1,0 +1,50 @@
+# Секреты и конфиги
+.env
+*.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# Виртуальные окружения
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Временные файлы
+result.txt
+*.tmp
+*.log
+logs/
+
+# Изображения генерируемые ботом (не исходники)
+result*.png
+output*.png
+
+# Docker
+*.override.yml
