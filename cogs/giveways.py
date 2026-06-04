@@ -9,10 +9,11 @@ from jinja2 import Template
 import io
 from PIL import Image
 import os
+import uuid
 from datetime import datetime, timedelta
 import pymongo
 
-hti = Html2Image()
+hti = Html2Image(custom_flags=['--no-sandbox', '--disable-gpu'])
 
 class GivewayCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -106,10 +107,13 @@ class GivewayCog(commands.Cog):
                         'winners': users,
                         'avatar': guild.icon.url
                     }
-                    self.render_profile_card('./static/giveway.html', output_path='./static/giveway_final.html',
-                                             **variables)
-                    hti.screenshot(html_file='./static/giveway_final.html', save_as='giveway.png', size=[324, 380])
-                    with Image.open('./giveway.png') as img:
+                    unique_id = uuid.uuid4().hex
+                    html_file = f'./static/giveway_final_{unique_id}.html'
+                    png_file = f'giveway_{unique_id}.png'
+
+                    self.render_profile_card('./static/giveway.html', output_path=html_file, **variables)
+                    hti.screenshot(html_file=html_file, save_as=png_file, size=[324, 380])
+                    with Image.open(png_file) as img:
                         # Координаты: left, top, right, bottom
                         img_buffer = io.BytesIO()
                         print(count_winners)
@@ -123,6 +127,15 @@ class GivewayCog(commands.Cog):
                             return
                         cropped_img.save(img_buffer, format='PNG')
                         img_buffer.seek(0)
+                        
+                    try:
+                        if os.path.exists(html_file):
+                            os.remove(html_file)
+                        if os.path.exists(png_file):
+                            os.remove(png_file)
+                    except Exception as e:
+                        print(f"Error removing temp files: {e}")
+
                     await channel.send(file=disnake.File(img_buffer, filename='giveway.png'))
 
 

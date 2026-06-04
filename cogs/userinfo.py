@@ -340,7 +340,7 @@ class InfoCog(commands.Cog):
                         )
             embed.set_footer(text=f'ID: {участник.id}')
 
-            if участник != True:
+            if участник == inter.author:
                 select_menu.callback = select_callback
 
                 # Создаем view и добавляем в него select menu
@@ -353,7 +353,7 @@ class InfoCog(commands.Cog):
         except Exception as e:
             print(f"Error editing response: {e}")
 
-            if участник is None:
+            if участник == inter.author:
                 select_menu.callback = select_callback
 
                 # Создаем view и добавляем в него select menu
